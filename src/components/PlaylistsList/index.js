@@ -1,11 +1,10 @@
 import React from 'react'
 import qwest from 'qwest'
+// import axios from 'axios'
 
+import { get } from './axiosRequester.js'
 import InfiniteScroll from '../InfiniteScroll/index.js'
-
-const PATH = "https://staging-api.soundstripe.com/v1/curated_playlists?page%5Blimit%5D=8"
-const QWEST_PATH = "/qwest"
-const AXIOS_PATH = "/axios"
+import { AXIOS_ROUTE, QWEST_ROUTE, REQUEST_PATH, QWEST_DEFAULT_HEADERS } from './constants.js'
 
 export class PlaylistCardsList extends React.PureComponent {
   constructor(props) {
@@ -18,17 +17,17 @@ export class PlaylistCardsList extends React.PureComponent {
   }
 
   handleLoadMore = page => {
-    let requestURL = PATH
+    let requestURL = REQUEST_PATH
     if(this.state.nextHref != null) {
       requestURL = this.state.nextHref
     }
 
     switch(this.props.location.pathname) { 
-      case QWEST_PATH: { 
+      case QWEST_ROUTE: { 
         this.loadWithQwest(requestURL)
         break
       }
-      case AXIOS_PATH: { 
+      case AXIOS_ROUTE: { 
         this.loadWithAxios(requestURL)
         break 
       }
@@ -41,23 +40,24 @@ export class PlaylistCardsList extends React.PureComponent {
 
   loadWithQwest(requestURL) {
     var self = this;
-    qwest.get(requestURL, null, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-      },
-      responseType: 'json'
-    })
+    qwest.get(
+      requestURL,
+      null,
+      QWEST_DEFAULT_HEADERS
+    )
     .then(function(xhr, resp) {
       if(resp) {
+        const newCards = self.state.cards.concat(resp.data)
         if(resp.links.next) {
           self.setState({
-            cards: self.state.cards.concat(resp.data),
+            cards: newCards,
             nextHref: resp.links.next
           })
         } else {
           self.setState({
-            nextHref: null
+            cards: newCards,
+            nextHref: null,
+            // hasMore: false
           })
         }
       }
@@ -65,29 +65,45 @@ export class PlaylistCardsList extends React.PureComponent {
   }
 
   loadWithAxios(requestURL) {
-    var self = this;
-    qwest.get(requestURL, null, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-      },
-      responseType: 'json'
-    })
-    .then(function(xhr, resp) {
-      if(resp) {
-        if(resp.links.next) {
-          self.setState({
-            cards: self.state.cards.concat(resp.data),
-            nextHref: resp.links.next
+    get(requestURL)
+      .then(response => {
+        const newCards = this.state.cards.concat(response.data)
+        if(response.links.next) {
+          this.setState({
+            cards: newCards,
+            nextHref: response.links.next
           })
         } else {
-          self.setState({
-            nextHref: null
+          this.setState({
+            cards: newCards,
+            nextHref: null,
+            // hasMore: false
           })
         }
-      }
-    })
-  }
+      })
+    }
+
+  // loadWithAxios(requestURL) {
+  //   var self = this;
+  //   axios.get(requestURL, {
+  //     headers: REQUEST_HEADER,
+  //     data: {}
+  //   })
+  //   .then(function(resp) {
+  //     if(resp.data) {
+  //       if(resp.data.links.next) {
+  //         self.setState({
+  //           cards: self.state.cards.concat(resp.data.data),
+  //           nextHref: resp.data.links.next
+  //         })
+  //       } else {
+  //         self.setState({
+  //           nextHref: null
+  //         })
+  //       }
+  //     }
+  //   })
+  // }
 
   render() {
     var items = [];
