@@ -98,28 +98,6 @@ export class PlaylistCardsList extends React.PureComponent {
     })
   }
 
-  // loadWithAxios(requestURL) {
-  //   var self = this;
-  //   axios.get(requestURL, {
-  //     headers: REQUEST_HEADER,
-  //     data: {}
-  //   })
-  //   .then(function(resp) {
-  //     if(resp.data) {
-  //       if(resp.data.links.next) {
-  //         self.setState({
-  //           cards: self.state.cards.concat(resp.data.data),
-  //           nextHref: resp.data.links.next
-  //         })
-  //       } else {
-  //         self.setState({
-  //           nextHref: null
-  //         })
-  //       }
-  //     }
-  //   })
-  // }
-
   render() {
     var items = [];
     this.state.cards.map((track, i) => {
