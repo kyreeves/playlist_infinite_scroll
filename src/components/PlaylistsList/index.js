@@ -46,27 +46,24 @@ export class PlaylistCardsList extends React.PureComponent {
   }
 
   loadWithQwest(requestURL) {
-    var self = this;
     qwest.get(
       requestURL,
       null,
       QWEST_DEFAULT_HEADERS
     )
-    .then(function(xhr, resp) {
-      if(resp) {
-        const newCards = self.state.cards.concat(resp.data)
-        if(resp.links.next) {
-          self.setState({
-            cards: newCards,
-            nextHref: resp.links.next
-          })
-        } else {
-          self.setState({
-            cards: newCards,
-            nextHref: null,
-            // hasMore: false
-          })
-        }
+    .then((xhr, response) => {
+      const newCards = this.state.cards.concat(response.data)
+      if(response.links.next) {
+        this.setState({
+          cards: newCards,
+          nextHref: response.links.next
+        })
+      } else {
+        this.setState({
+          cards: newCards,
+          nextHref: null,
+          // hasMore: false
+        })
       }
     })
   }

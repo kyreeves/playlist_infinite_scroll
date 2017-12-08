@@ -14,7 +14,6 @@ const App = () =>
         <li><Link to="/qwest">qwest</Link></li>
         <li><Link to="/axios">axios</Link></li>
       </ul>
-
       <Route path="/qwest" component={PlaylistsList}/>
       <Route path="/axios" component={PlaylistsList}/>
     </div>
