@@ -13,7 +13,7 @@ const QWEST_DEFAULT_HEADERS = {
   responseType: 'json'
 }
 
-export class PlaylistCardsList extends React.PureComponent {
+export default class PlaylistCardsList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -120,5 +120,3 @@ export class PlaylistCardsList extends React.PureComponent {
     )
   }
 }
-
-export default PlaylistCardsList
