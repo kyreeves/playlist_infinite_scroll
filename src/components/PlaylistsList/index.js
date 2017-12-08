@@ -1,10 +1,17 @@
 import React from 'react'
 import qwest from 'qwest'
-// import axios from 'axios'
+import axios from 'axios'
 
-import { get } from './axiosRequester.js'
 import InfiniteScroll from '../InfiniteScroll/index.js'
-import { AXIOS_ROUTE, QWEST_ROUTE, REQUEST_PATH, QWEST_DEFAULT_HEADERS } from './constants.js'
+
+const REQUEST_PATH = "https://staging-api.soundstripe.com/v1/curated_playlists?page%5Blimit%5D=8"
+const QWEST_DEFAULT_HEADERS = {
+  headers: {
+    'Content-Type': 'application/vnd.api+json',
+    'Accept': 'application/vnd.api+json'
+  },
+  responseType: 'json'
+}
 
 export class PlaylistCardsList extends React.PureComponent {
   constructor(props) {
@@ -23,11 +30,11 @@ export class PlaylistCardsList extends React.PureComponent {
     }
 
     switch(this.props.location.pathname) { 
-      case QWEST_ROUTE: { 
+      case "/qwest": { 
         this.loadWithQwest(requestURL)
         break
       }
-      case AXIOS_ROUTE: { 
+      case "/axios": { 
         this.loadWithAxios(requestURL)
         break 
       }
@@ -65,23 +72,31 @@ export class PlaylistCardsList extends React.PureComponent {
   }
 
   loadWithAxios(requestURL) {
-    get(requestURL)
-      .then(response => {
-        const newCards = this.state.cards.concat(response.data)
-        if(response.links.next) {
-          this.setState({
-            cards: newCards,
-            nextHref: response.links.next
-          })
-        } else {
-          this.setState({
-            cards: newCards,
-            nextHref: null,
-            // hasMore: false
-          })
-        }
-      })
+    const request = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json'
+      },
+      data: {},
+      method: "GET",
+      url: `${requestURL}`
     }
+    axios(request).then(response => {
+      const newCards = this.state.cards.concat(response.data.data)
+      if(response.data.links.next) {
+        this.setState({
+          cards: newCards,
+          nextHref: response.data.links.next
+        })
+      } else {
+        this.setState({
+          cards: newCards,
+          nextHref: null,
+          // hasMore: false
+        })
+      }
+    })
+  }
 
   // loadWithAxios(requestURL) {
   //   var self = this;
